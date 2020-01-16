@@ -1,6 +1,10 @@
 <template>
   <div class="hello">
     <h1>{{ msg }}</h1>
+    <h1>{{ strOrNum }}</h1>
+    <p>{{ userName }}</p>
+    <p>{{ foo }}</p>
+    <h2 @click="show = !show">切换</h2>
     <p>
       For a guide and recipes on how to configure / customize this project,<br>
       check out the
@@ -32,15 +36,80 @@
       <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
       <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
     </ul>
+    <input
+      type="text"
+      v-model="inputVal"
+      @keyup.enter="onKeyUp"
+    >
+      {{ foodList }}
+      {{ foodListStr }}
+    <p>{{ show }}</p>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+/// <reference path="../shims-store.d.ts" />
+import { Component, Prop, Vue, PropSync, Watch } from 'vue-property-decorator';
+import { State, Action, Getter } from 'vuex-class';
+import { FoodAction } from '@/store/modules/food';
 
 @Component
 export default class HelloWorld extends Vue {
+  @State('user') userName!: string;
+  @State foo!: string;
+  @State((state: StoreLib.State) => state.food.list) foodList!: string[];
+  @Action('SET_LIST') setFoodList!: FoodAction['SET_LIST'];
+  // @Getter('foodList') foodListStr!: string;
+  @Getter foodListStr!: string;
+
+  inputVal: string = 'orange';
+
   @Prop() private msg!: string;
+  @Prop() private strOrNum!: string | number;
+  // 等于：
+  // props: {
+  //   msg: {
+  //     type: String
+  //   },
+  //   strOrNum: {
+  //     type: [String, Number]
+  //   }
+  // }
+  @PropSync('value', { type: Boolean }) private show!: boolean;
+  // PropSync 等于：
+  // props: {
+  //   value: {
+  //     type: Boolean
+  //   }
+  // },
+  // computed: {
+  //   show: {
+  //     get() {
+  //       return this.value
+  //     },
+  //     set(value) {
+  //       this.$emit('update:value', value)
+  //     }
+  //   }
+  // }
+
+  privateMethod() {
+    console.log('privateMethod');
+  }
+
+  publicMethod() {
+    console.log('publicMethod');
+  }
+
+  onKeyUp() {
+    this.setFoodList([...this.foodList, this.inputVal]);
+    this.inputVal = '';
+  }
+
+  @Watch('inputVal', { immediate: true })
+  inputHandler(val: string): void {
+    this.show = !!(val.length % 2);
+  }
 }
 </script>
 

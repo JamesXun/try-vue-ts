@@ -6,6 +6,8 @@ import store from './store';
 
 Vue.config.productionTip = false;
 
+Vue.prototype.$log = (...args: any[]) => console.log(...args);
+
 new Vue({
   router,
   store,

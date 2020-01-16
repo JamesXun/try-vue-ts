@@ -1,18 +1,35 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <img alt="Vue logo" src="../assets/logo.png" @click="show = !show">
+    <HelloWorld
+      ref="HelloWorld"
+      msg="Welcome to Your Vue.js App"
+      :str-or-num="123"
+      :value.sync="show"
+    />
   </div>
 </template>
 
-<script>
-// @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator';
+import HelloWorld from '@/components/HelloWorld.vue';
 
-export default {
-  name: 'home',
+@Component({
   components: {
-    HelloWorld
+    HelloWorld,
+  },
+})
+export default class Home extends Vue {
+  show: boolean = true;
+
+  $refs!: {
+    HelloWorld: any;
+  };
+
+  mounted() {
+    this.$refs.HelloWorld.privateMethod();
+    this.$refs.HelloWorld.publicMethod();
+    this.$log('123');
   }
 }
 </script>
